@@ -241,6 +241,42 @@ header .spacer{min-width:4px;}
 .arcItem .ar{display:flex;gap:7px;flex-wrap:wrap;}
 .updbar{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:65;background:var(--gold);color:#141414;border-radius:11px;padding:12px 14px;font-weight:800;display:none;align-items:center;gap:10px;box-shadow:0 6px 24px rgba(0,0,0,.5);}
 .updbar.on{display:flex;} .updbar span{flex:1;} .updbar button{background:#141414;color:var(--gold);padding:9px 14px;border-radius:9px;font-weight:800;}
+
+/* ---- cash bar ---- */
+.modeSeg .seg{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px 10px;font-size:15px;}
+.modeSeg .seg small{font-size:11px;font-weight:600;opacity:.75;margin-top:2px;}
+body.cash .om, body:not(.cash) .cm, body:not(.cash) .cmi{display:none !important;}
+#ticket{display:none;flex:0 0 300px;flex-direction:column;background:var(--ink2);border-left:1px solid var(--line);min-height:0;}
+body.cash #ticket{display:flex;}
+body.cash #billBar{display:none;}
+.tkHead{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line);}
+#tkLines{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 10px;}
+.tkL{display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid #232c39;}
+.tkL .tkn{flex:1;font-size:13px;font-weight:600;line-height:1.2;}
+.tkL .tkn small{display:block;color:var(--dim);font-weight:500;}
+.tkL .tkq{min-width:22px;text-align:center;font-weight:800;color:var(--gold);}
+.tkL .tkp{min-width:64px;text-align:right;font-size:13px;font-weight:700;}
+.tkL .step{width:30px;height:30px;font-size:17px;}
+.tkFoot{padding:10px 12px;border-top:1px solid var(--line);padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+.tkTot{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+.tkTot span{color:var(--dim);font-size:13px;} .tkTot b{font-size:24px;color:var(--gold);}
+#tkCharge[disabled]{opacity:.35;}
+.payM{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.payM button{padding:16px 6px;border-radius:11px;background:var(--ink3);border:1px solid var(--line);font-weight:800;font-size:16px;color:var(--txt);}
+.payM button.on{background:var(--gold);color:#141414;border-color:var(--gold);}
+.qbtn{padding:9px 12px;border-radius:8px;background:var(--ink3);border:1px solid var(--line);font-weight:800;font-size:14px;}
+.saleRow{display:flex;gap:10px;align-items:center;padding:10px 4px;border-bottom:1px solid #232c39;cursor:pointer;}
+.saleRow:active{background:#26303e;}
+.saleRow .st{color:var(--dim);font-size:12.5px;min-width:44px;font-variant-numeric:tabular-nums;}
+.saleRow .si2{flex:1;font-size:13.5px;line-height:1.3;}
+.saleRow .sm{font-size:12px;font-weight:800;padding:4px 8px;border-radius:7px;background:var(--ink3);border:1px solid var(--line);}
+.saleRow .sa{min-width:76px;text-align:right;font-weight:800;}
+.saleRow.void .si2,.saleRow.void .sa{text-decoration:line-through;color:var(--dim);}
+@media(max-width:760px){
+  body.cash #ticket{position:fixed;left:0;right:0;bottom:calc(52px + env(safe-area-inset-bottom));max-height:38vh;z-index:20;border-left:0;border-top:2px solid var(--gold);box-shadow:0 -6px 18px rgba(0,0,0,.45);}
+  body.cash #grid{padding-bottom:40vh;}
+  body.cash .tkFoot{padding-bottom:10px;display:flex;gap:10px;align-items:center;} body.cash .tkTot{flex:1;margin:0;} body.cash #tkCharge{width:auto;padding:12px 18px;}
+}
 </style>
 </head>
 <body>
@@ -251,6 +287,7 @@ header .spacer{min-width:4px;}
   <div class="spacer"></div>
   <nav id="nav">
   <button class="navbtn on" data-v="serve">Serve</button>
+  <button class="navbtn cmi" data-v="sales">Sales</button>
   <button class="navbtn" data-v="glasses">Glasses</button>
   <button class="navbtn" data-v="staff">Staff</button>
   <button class="navbtn" data-v="stock">Stock</button>
@@ -267,18 +304,25 @@ header .spacer{min-width:4px;}
     <div class="card">
       <img id="setupLogo" class="setuplogo" alt="South Side — bar catering & consulting">
       <h2>Open the bar</h2>
+      <div class="segs modeSeg" id="modeSeg" style="margin:8px 0 6px">
+        <button class="seg on" data-mode="open">Open bar<small>client pays a package</small></button>
+        <button class="seg" data-mode="cash">Cash bar<small>guests pay per drink</small></button>
+      </div>
       <p class="hint">Fill this in once, before the first drink. Everything after is saved on this device as you go, so it survives the screen locking or the browser reloading, with no wifi needed.</p>
       <label class="f"><span>Event</span><input class="t" id="sEv" placeholder="e.g. Summer wedding" autocapitalize="words"></label>
       <div class="split"><label class="f"><span>Date</span><input class="t" id="sDt" placeholder="dd/mm/yyyy"></label>
       <label class="f"><span>Guests</span><input class="t" id="sGu" inputmode="numeric" placeholder="e.g. 80"></label></div>
-      <div class="split3">
+      <div class="split3 om">
         <label class="f"><span>Hours</span><input class="t" id="sHr" inputmode="decimal" placeholder="e.g. 3"></label>
         <label class="f"><span>Rate €/guest/hour</span><input class="t" id="sRt" inputmode="decimal" placeholder="e.g. 10,26"></label>
         <label class="f"><span>Package total €</span><input class="t" id="sPk" inputmode="decimal" placeholder="auto"></label>
       </div>
-      <p class="hint" style="margin-top:-4px">Type the rate and the package total fills in (guests × hours × rate). Or type the total directly if the package was quoted as a flat figure.</p>
+      <div class="split cm"><label class="f"><span>Hours</span><input class="t" id="sHr2" inputmode="decimal" placeholder="e.g. 4"></label>
+        <label class="f"><span>Opening cash float €</span><input class="t" id="sFl" inputmode="decimal" placeholder="e.g. 150"></label></div>
+      <p class="hint cm" style="margin-top:-4px">Cash bar: every drink is sold to the guest from the Serve screen (build the order, then charge it as Cash, Card or MB Way). The float is the change you start the drawer with; it is checked at cash-up.</p>
+      <p class="hint om" style="margin-top:-4px">Type the rate and the package total fills in (guests × hours × rate). Or type the total directly if the package was quoted as a flat figure.</p>
       <label class="f"><span>Refundable breakage deposit €</span><input class="t" id="sDp" inputmode="decimal" placeholder="e.g. 100"></label>
-      <label class="f"><span>Transportation fee € (charged separately)</span><input class="t" id="sTr" inputmode="decimal" placeholder="e.g. 80"></label>
+      <label class="f"><span>Transportation fee € (charged to the client separately)</span><input class="t" id="sTr" inputmode="decimal" placeholder="e.g. 80"></label>
       <div style="margin-bottom:12px">
         <span style="display:block;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px">Staff working</span>
         <div id="staffRows"></div>
@@ -305,6 +349,12 @@ header .spacer{min-width:4px;}
     <div id="serveTop">
       <div id="cats"></div>
       <div id="grid"></div>
+      <div id="ticket">
+        <div class="tkHead"><b>Order</b><button class="tinybtn" id="tkClear">Clear</button></div>
+        <div id="tkLines"></div>
+        <div class="tkFoot"><div class="tkTot"><span id="tkCount">0 items</span><b id="tkTotal">€0,00</b></div>
+          <button class="big" id="tkCharge" disabled>Charge</button></div>
+      </div>
     </div>
     <div id="undobar">
       <div class="tot"><b id="uTot">0</b> drinks</div>
@@ -399,6 +449,16 @@ header .spacer{min-width:4px;}
     </div>
   </div>
 
+  <!-- SALES (cash bar) -->
+  <div class="panel" id="p-sales">
+    <div class="card">
+      <h2>Sales</h2>
+      <p class="hint">Every paid order, newest first. Tap one to change its payment method or to void it (refund / mistake). Voided sales stay listed for the record but are taken out of the totals and the drink counts.</p>
+      <div id="salesTot"></div>
+    </div>
+    <div class="card"><div id="salesList"></div></div>
+  </div>
+
   <!-- STAFF HOURS -->
   <div class="panel" id="p-staff">
     <div class="card">
@@ -469,17 +529,22 @@ header .spacer{min-width:4px;}
   <div class="panel" id="p-close">
     <div class="card"><h2>Consumption</h2><div id="repCons"></div></div>
     <div class="card"><h2>Consumption by hour</h2><div id="repTiming"></div></div>
-    <div class="card">
+    <div class="card cm" id="cardSales"><h2>Bar sales</h2><div id="repSales"></div></div>
+    <div class="card cm" id="cardCashup"><h2>Cash-up</h2>
+      <p class="hint">Count the cash in the drawer at the end of the night (float included) and type it here. Card and MB Way totals should match the terminal / MB Way report.</p>
+      <label class="f" style="max-width:280px"><span>Cash counted in drawer €</span><input class="t" id="cCount" inputmode="decimal" placeholder="e.g. 1.240,50"></label>
+      <div id="repCashup"></div></div>
+    <div class="card om">
       <h2>Service time &amp; charges</h2>
       <p class="hint">Add extra service time if the bar ran longer — it's priced per guest per hour, the same rate as the package. Transportation is billed separately.</p>
       <label class="f" style="max-width:280px"><span>Extra service time (hours)</span><input class="t" id="cExtra" inputmode="decimal" placeholder="0"></label>
       <div id="repCharges"></div>
     </div>
-    <div class="card"><h2>Billed cocktails (dinner)</h2>
+    <div class="card om"><h2>Billed cocktails (dinner)</h2>
       <label class="f" style="max-width:280px"><span>Price per billed cocktail €</span><input class="t" id="cBill" inputmode="decimal" placeholder="e.g. 8,00"></label>
       <div id="repBilled"></div>
     </div>
-    <div class="card"><h2>Are we charging enough?</h2><div id="repValue"></div></div>
+    <div class="card om"><h2>Are we charging enough?</h2><div id="repValue"></div></div>
     <div class="card"><h2>Client-provided drinks</h2><div id="repClient"></div></div>
     <div class="card"><h2>What they drank</h2><div id="repItems"></div></div>
     <div class="card"><h2>Spirits — how they were served</h2><div id="repServes"></div></div>
@@ -532,6 +597,29 @@ header .spacer{min-width:4px;}
   <div class="row"><button class="ghost" id="niCancel">Cancel</button><button class="big" id="niAdd" style="padding:13px">Add &amp; count</button></div>
 </div></div>
 
+<div id="payOv" class="ovl"><div class="box" style="max-width:460px">
+  <h3>Charge <span id="payTotal" style="color:var(--gold)">€0,00</span></h3>
+  <p id="paySub" style="margin-bottom:12px"></p>
+  <div class="payM" id="payMethods"></div>
+  <div class="split" style="margin-top:12px">
+    <label class="f"><span>Tip €</span><input class="t" id="payTip" inputmode="decimal" placeholder="0"></label>
+    <label class="f payCashOnly"><span>Cash received €</span><input class="t" id="payRecv" inputmode="decimal" placeholder="exact"></label>
+  </div>
+  <div class="payCashOnly" id="payQuick" style="display:flex;gap:7px;flex-wrap:wrap;margin:-4px 0 10px"></div>
+  <div class="read payCashOnly" id="payChange" style="margin-bottom:12px"></div>
+  <div class="row"><button class="ghost" id="payCancel" style="padding:14px">Back</button><button class="big" id="payOk" style="padding:14px">Confirm payment</button></div>
+</div></div>
+
+<div id="saleOv" class="ovl"><div class="box" style="max-width:460px">
+  <h3 id="sdTitle">Sale</h3>
+  <p id="sdSub"></p>
+  <div id="sdLines" style="margin-bottom:12px"></div>
+  <span style="display:block;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Payment method</span>
+  <div class="payM" id="sdMethods" style="margin-bottom:12px"></div>
+  <label class="f" id="sdReasonWrap"><span>Reason for voiding</span><input class="t" id="sdReason" placeholder="e.g. wrong drink, refunded"></label>
+  <div class="row"><button class="ghost" id="sdClose" style="padding:13px">Close</button><button class="danger" id="sdVoid" style="padding:13px">Void sale</button></div>
+</div></div>
+
 <div id="billSet" class="ovl"><div class="box">
   <h3>Per-cocktail price</h3>
   <p>During billed service every drink you register is charged to the client at this flat price. You can change it any time.</p>
@@ -560,6 +648,8 @@ header .spacer{min-width:4px;}
    4. Every release: bump APP_VERSION below AND the CACHE name in sw.js to the same number.
    5. Test on a tablet before an event: open the bar, tap drinks fast, use a spirit (mixer
       picker), break a glass, export Excel, save a backup, then "Clear and start new event".
+      Then the same as a Cash bar: build an order, charge Cash (with change), Card and MB Way,
+      void one sale, enter the counted cash, export Excel.
 
    WHERE THINGS ARE (search for these headings)
    - BUILT-IN DEFAULT CATALOGUE … starting drinks/glasses/mixers/roles (only used on first run
@@ -573,6 +663,9 @@ header .spacer{min-width:4px;}
    - Backup / Restore / Merge … backup files and combining devices.
    - FAST, RELIABLE TAPS … fastTap() (counts on finger-up; don't go back to onclick for tiles).
    - STAFF HOURS / STOCK COUNT / PAST EVENTS / SETTINGS / DEVICE / ANDROID BACK BUTTON.
+   - CASH BAR (point of sale) … S.mode "open"|"cash", S.ticket (current order), payment screen,
+     S.sales (each paid order, with method/tip/void), Sales tab, cash-up. PAYMENTS lists the methods.
+     In cash mode every drink in S.log carries {sale:id}; voiding a sale removes those entries.
    - NAV / SETUP … show(view), Open the bar (sGo), Clear and start new event (resetBtn).
    - BOOT … start-up order: loadCat() -> load() -> migrateV1() -> draw.
    ===================================================================================== */
@@ -666,7 +759,7 @@ var KEY="ssb_openbar_v1";                 // the live event
 var CATKEY="ssb_openbar_catalog_v1";      // the catalogue (drinks, glasses, mixers, roles)
 var ARCKEY="ssb_openbar_archive_v1";      // closed events
 var PREFKEY="ssb_openbar_prefs_v1";       // device preferences (keep screen awake…)
-var APP_VERSION="2.0.0";                  // bump this AND the CACHE name in sw.js on every update
+var APP_VERSION="2.1.0";                  // bump this AND the CACHE name in sw.js on every update
 
 /* ============ LIVE CATALOGUE ============ */
 var CAT=null, MENU=[], GLASSES=[], MIXERS=[], CATFLAGS={}, DEFP={}, GDEF={}, SPU={};
@@ -706,7 +799,8 @@ var S={open:false,ev:"",dt:"",guests:0,hours:0,pkg:0,rate:0,deposit:0,transport:
        staff:[],log:[],seq:1,billing:false,billedPrice:0,
        counts:{},breaks:{},serves:{},prices:{},
        customItems:[],glassSel:{},glassPrices:{},itemSel:{},clientItems:{},
-       shifts:[],stock:{},openedAt:null};
+       shifts:[],stock:{},openedAt:null,
+       mode:"open",float:0,sales:[],ticket:[],cashCount:null};
 /* fill any missing fields (old backups, older app versions) */
 function normalizeState(st){
   if(!st.prices)st.prices={}; if(!st.serves)st.serves={}; if(!st.counts)st.counts={}; if(!st.breaks)st.breaks={};
@@ -714,6 +808,7 @@ function normalizeState(st){
   if(!st.staff)st.staff=[]; if(st.transport==null)st.transport=0; if(st.extraHours==null)st.extraHours=0;
   if(st.billing==null)st.billing=false; if(st.billedPrice==null)st.billedPrice=0; if(!st.clientItems)st.clientItems={};
   if(!st.shifts)st.shifts=[]; if(!st.stock)st.stock={}; if(st.openedAt===undefined)st.openedAt=null;
+  if(st.mode!=="cash")st.mode="open"; if(st.float==null)st.float=0; if(!st.sales)st.sales=[]; if(!st.ticket)st.ticket=[]; if(st.cashCount===undefined)st.cashCount=null;
   if(!st.log){ st.log=synthLog(st); }
   if(!st.seq){ var mx=0; for(var i=0;i<st.log.length;i++) if(st.log[i].id>mx)mx=st.log[i].id; st.seq=mx+1; }
   return st; }
@@ -832,6 +927,10 @@ function drawUndo(){ var last=S.log.length?S.log[S.log.length-1]:null;
   if(last) lt = last.kind==="drink"
     ? ("Last: "+last.item+(last.mixer?" \u00b7 "+last.mixer:""))
     : ("Last: glass — "+gName(last.item));
+  if(S.mode==="cash"){ var ls=null; for(var i=S.sales.length-1;i>=0;i--) if(!S.sales[i].void){ ls=S.sales[i]; break; }
+    lt = S.ticket.length ? ("Order: "+ticketCount()+" item(s) \u00b7 "+eur(ticketTotal())) : (ls ? "Last sale "+fmtTime(ls.t)+": "+eur(ls.total)+" \u00b7 "+ls.method : "Tap drinks to build an order.");
+    el("uLast").textContent=lt; el("undoBtn").disabled=!S.ticket.length; el("undoBtn").textContent="Remove last"; return; }
+  el("undoBtn").textContent="Undo last";
   el("uLast").textContent=lt;
   el("undoBtn").disabled = !last; }
 
@@ -863,7 +962,8 @@ function pour(n,mixer){ var billed = !!S.billing && isBillable(catNameOf(n));
   else if(mixer) toast(n+" \u00b7 "+mixer); }
 function breakGlass(k){ logAdd({kind:"glass",item:k,mixer:null,t:Date.now()});
   drawGlasses(); drawUndo(); toast(feeSet(k)?("Glass logged — "+eur(feeOf(k))):"Glass logged — set its fee in Glasses"); }
-function undo(){ if(!S.log.length) return; var e=S.log.pop(); recompute(); save();
+function undo(){ if(S.mode==="cash"){ ticketUndo(); return; }
+  if(!S.log.length) return; var e=S.log.pop(); recompute(); save();
   drawGrid(); drawCats(); drawGlasses(); drawUndo(); drawBill();
   toast("Undone: "+(e.kind==="drink"?e.item+(e.mixer?" \u00b7 "+e.mixer:""):gName(e.item))); }
 
@@ -893,7 +993,7 @@ function openMix(n){ pendingSpirit=n; el("mixName").textContent=n;
   el("mixGrid").innerHTML=h; el("mix").classList.add("on"); }
 function closeMix(){ el("mix").classList.remove("on"); pendingSpirit=null; }
 fastTap(el("mixGrid"), ".mx", function(b){ if(!pendingSpirit)return;
-  var sp=pendingSpirit; closeMix(); pour(sp, decodeURIComponent(b.dataset.mx)); });
+  var sp=pendingSpirit; closeMix(); tapDrink(sp, decodeURIComponent(b.dataset.mx)); });
 el("mixCancel").onclick=closeMix;
 
 fastTap(el("cats"), ".cat", function(b){
@@ -902,7 +1002,7 @@ fastTap(el("cats"), ".cat", function(b){
 fastTap(el("grid"), ".item", function(b){
   if(b.classList.contains("additem")){ openNewItem(); return; }
   var n=decodeURIComponent(b.dataset.n);
-  if(isSpirit(catNameOf(n))) openMix(n); else pour(n,null); });
+  if(isSpirit(catNameOf(n))) openMix(n); else tapDrink(n,null); });
 el("undoBtn").onclick=undo;
 
 /* off-menu item modal */
@@ -917,7 +1017,7 @@ el("niAdd").onclick=function(){
   if(found){ if(pr) found[1]=pr; } else S.customItems.push([nm, pr||0]);
   closeNewItem();
   var m=serveMenu(); cat=m.length-1;   // jump to Other
-  pour(nm,null); drawCats(); drawGrid();
+  tapDrink(nm,null); drawCats(); drawGrid();
 };
 
 /* ============ GLASSES ============ */
@@ -993,6 +1093,7 @@ if(el("gcDone")) el("gcDone").onclick=function(){ show(S.open?"glasses":"setup")
 if(el("gcAll")) el("gcAll").onclick=function(){ for(var k=0;k<GLASSES.length;k++) S.glassSel[GLASSES[k][0]]=true; save(); drawGlassCfg(); };
 if(el("gcNone")) el("gcNone").onclick=function(){ for(var k=0;k<GLASSES.length;k++) S.glassSel[GLASSES[k][0]]=false; save(); drawGlassCfg(); };
 function drawAdjust(){ var h="", any=false, a,b, m=menu();
+  if(S.mode==="cash"){ h+='<p class="hint">Cash bar: drink counts come from the sales. To correct a drink, void the sale in <b>Sales</b> (and charge it again if needed). Glasses can be adjusted below.</p>'; m=[]; any=true; }
   for(a=0;a<m.length;a++){ var rows="", spirit=isSpirit(m[a].c);
     for(b=0;b<m[a].i.length;b++){ var n=m[a].i[b][0], q=S.counts[n]||0; if(!q) continue; any=true;
       var ek=encodeURIComponent(n);
@@ -1080,6 +1181,10 @@ function openEdit(id){ var e=findLog(id); if(!e)return; editingId=id;
     el("eeBill").classList.toggle("on", !!e.billed);
     el("eeBill").textContent = e.billed ? ("Billed "+eur(S.billedPrice||0)+" — tap to make open bar") : "Mark as billed";
   } else el("eeBillWrap").style.display="none";
+  var sl = e.sale ? findSale(e.sale) : null;
+  el("eeDelete").style.display = sl ? "none" : "";
+  if(sl){ el("eeSub").textContent += "   \u00b7   part of a "+sl.method+" sale ("+eur(sl.total)+"). To cancel it, void the sale in Sales."; }
+  if(S.mode==="cash") el("eeBillWrap").style.display="none";
   el("editEntry").classList.add("on"); }
 el("eeBill").onclick=function(){ var e=findLog(editingId); if(!e)return; e.billed=!e.billed; save();
   el("eeBill").classList.toggle("on", !!e.billed);
@@ -1143,10 +1248,12 @@ function report(){
   var r={items:{},cats:{},total:0,consVal:0,breakVal:0,breaks:[],
          countTotal:0,countVal:0,nonCountTotal:0,nonCountVal:0,
          clientTotal:0,clientVal:0,clientItems:{}};
-  var a,b,n,q, m=menu();
+  var a,b,n,q, m=menu(), rev=null;
+  if(S.mode==="cash"){ rev={}; for(var si=0;si<S.sales.length;si++){ var sv=S.sales[si]; if(sv.void) continue;
+    for(var li=0;li<sv.lines.length;li++){ var ln=sv.lines[li]; rev[ln.item]=(rev[ln.item]||0)+ln.q*ln.p; } } }
   for(a=0;a<m.length;a++){ var cnts=countsToward(m[a].c);
     for(b=0;b<m[a].i.length;b++){ n=m[a].i[b][0]; q=S.counts[n]||0; if(!q) continue;
-      var cl=isClient(n), v=q*priceOf(n);
+      var cl=isClient(n), v=(rev && rev[n]!=null) ? Math.round(rev[n]*100)/100 : q*priceOf(n);
       r.items[n]={q:q,v:v,c:m[a].c,cnt:cnts,client:cl}; r.total+=q;
       if(cl){ r.clientTotal+=q; r.clientVal+=v; r.clientItems[n]=q; }
       else { r.consVal+=v;
@@ -1289,6 +1396,7 @@ function drawClose(){
   el("repBreak").innerHTML=breakReport();
   el("repStaff").innerHTML=staffReportHTML();
   el("repStock").innerHTML=stockReportHTML();
+  if(S.mode==="cash") drawCashReports();
 }
 
 /* ============ XLSX (offline, no libraries) ============ */
@@ -1312,7 +1420,8 @@ function sheetXML(rows,opts){
   for(var r=0;r<rows.length;r++){ x+='<row r="'+(r+1)+'">';
     for(var c=0;c<rows[r].length;c++){ var cell=rows[r][c]; if(cell==null){continue;}
       var ref=colL(c+1)+(r+1), st=cell.s?(' s="'+cell.s+'"'):"";
-      if(cell.f){ x+='<c r="'+ref+'"'+st+'><f>'+esc(cell.f)+'</f><v>'+(cell.v==null?0:cell.v)+'</v></c>'; }
+      if(cell.f && cell.v===""){ x+='<c r="'+ref+'"'+st+' t="str"><f>'+esc(cell.f)+'</f><v></v></c>'; }
+      else if(cell.f){ x+='<c r="'+ref+'"'+st+'><f>'+esc(cell.f)+'</f><v>'+(cell.v==null?0:cell.v)+'</v></c>'; }
       else if(cell.n){ x+='<c r="'+ref+'"'+st+'><v>'+cell.v+'</v></c>'; }
       else { x+='<c r="'+ref+'"'+st+' t="inlineStr"><is><t xml:space="preserve">'+esc(cell.v)+'</t></is></c>'; } }
     x+='</row>'; }
@@ -1404,14 +1513,60 @@ function buildBytes(){
     return { rows:[r1,r2c,[]], merges:["A1:"+last+"1","A2:"+last+"2"] };
   }
 
+  function dayFrac(t){ var d=new Date(t); return Math.round(((d.getHours()*60+d.getMinutes())/1440)*1e6)/1e6; }
+  var CASH = S_.mode==="cash";
+  // ---- Sales + Cash-up (cash bar only; built first so the Summary can point at them) ----
+  if(CASH){
+    var slT=titleRows("Sales",9), sl=slT.rows.slice();
+    sl.push([tx("Sale #",ST.hL),tx("Time",ST.hR),tx("Items",ST.hL),tx("Drinks",ST.hR),tx("Method",ST.hL),tx("Sale €",ST.hR),tx("Tip €",ST.hR),tx("Status",ST.hL),tx("Void reason",ST.hL)]);
+    var sF0=sl.length+1, nS=0, sTot=salesTotals(S_);
+    for(var q1=0;q1<S_.sales.length;q1++){ var sv=S_.sales[q1];
+      sl.push([nn(q1+1,ST.dI),{v:dayFrac(sv.t),n:true,s:ST.dT},tx(saleItemsText(sv),ST.dL),nn(saleQty(sv),ST.dI),tx(sv.method,ST.dL),nn(r2(sv.total),ST.dM),nn(r2(sv.tip||0),ST.dM),tx(sv.void?"Void":"Paid",ST.dL),tx(sv.voidReason||"",ST.dL)]); nS++; }
+    if(!nS) sl.push([tx("No sales recorded",ST.dL)]);
+    var sL0=sF0+Math.max(nS,1)-1, rgE="E"+sF0+":E"+sL0, rgF="F"+sF0+":F"+sL0, rgG="G"+sF0+":G"+sL0, rgH="H"+sF0+":H"+sL0;
+    sl.push([]); sl.push([tx("By payment method",ST.hL),tx("Orders",ST.hR),tx("Sales €",ST.hR),tx("Tips €",ST.hR),tx("Total taken €",ST.hR)]);
+    var pm0=sl.length+1, pmRow={};
+    for(var q2=0;q2<PAYMENTS.length;q2++){ var mth=PAYMENTS[q2], b0=sTot.by[mth]||{n:0,amt:0,tip:0}, R=sl.length+1; pmRow[mth]=R;
+      sl.push([tx(mth,ST.dL),fx('COUNTIFS('+rgE+',"'+mth+'",'+rgH+',"Paid")',b0.n,ST.dI),fx('SUMIFS('+rgF+','+rgE+',"'+mth+'",'+rgH+',"Paid")',r2(b0.amt),ST.dM),fx('SUMIFS('+rgG+','+rgE+',"'+mth+'",'+rgH+',"Paid")',r2(b0.tip),ST.dM),fx("C"+R+"+D"+R,r2(b0.amt+b0.tip),ST.dM)]); }
+    var pm1=sl.length, slTotRow=sl.length+1;
+    sl.push([tx("Total",ST.totL),fx("SUM(B"+pm0+":B"+pm1+")",sTot.orders,ST.totI),fx("SUM(C"+pm0+":C"+pm1+")",r2(sTot.sales),ST.totM),fx("SUM(D"+pm0+":D"+pm1+")",r2(sTot.tips),ST.totM),fx("SUM(E"+pm0+":E"+pm1+")",r2(sTot.sales+sTot.tips),ST.totM)]);
+    sl.push([]);
+    sl.push([tx("Voided sales (count)",ST.kL),fx('COUNTIF('+rgH+',"Void")',sTot.voidN,ST.kI)]);
+    sl.push([tx("Voided sales (value, not included)",ST.kL),fx('SUMIF('+rgH+',"Void",'+rgF+')',r2(sTot.voidAmt),ST.kM)]);
+    var slOpt={cols:[[1,1,9],[2,2,8],[3,3,46],[4,4,8],[5,5,12],[6,7,11],[8,8,9],[9,9,24]], merges:slT.merges, freeze:4};
+    var cu=cashUp(S_), cuT=titleRows("Cash-up",2), cr=cuT.rows.slice();
+    cr.push([tx("Opening float",ST.kL),nn(r2(cu.float),ST.kM)]); var cF=cr.length;
+    cr.push([tx("+ Cash sales",ST.kL),fx("'Sales'!C"+pmRow.Cash,r2(cu.cashSales),ST.kM)]); var cS=cr.length;
+    cr.push([tx("+ Cash tips",ST.kL),fx("'Sales'!D"+pmRow.Cash,r2(cu.cashTips),ST.kM)]); var cTp=cr.length;
+    cr.push([tx("Cash expected in drawer",ST.totL),fx("B"+cF+"+B"+cS+"+B"+cTp,r2(cu.expected),ST.totM)]); var cE=cr.length;
+    cr.push([tx("Cash counted",ST.kL), cu.counted==null?null:nn(r2(cu.counted),ST.kM)]); var cC=cr.length;
+    cr.push([tx("Difference (+ over / − short)",ST.totL),fx('IF(B'+cC+'="","",B'+cC+'-B'+cE+')',cu.diff==null?"":r2(cu.diff),ST.totM)]);
+    cr.push([tx("Cash to bank (counted − float)",ST.kL),fx('IF(B'+cC+'="","",B'+cC+'-B'+cF+')',cu.counted==null?"":r2(cu.counted-cu.float),ST.kM)]);
+    cr.push([]);
+    cr.push([tx("Card (TPA) — sales + tips, check against terminal",ST.kL),fx("'Sales'!E"+pmRow.Card,r2((sTot.by.Card||{amt:0}).amt+(sTot.by.Card||{tip:0}).tip),ST.kM)]);
+    cr.push([tx("MB Way — sales + tips",ST.kL),fx("'Sales'!E"+pmRow["MB Way"],r2((sTot.by["MB Way"]||{amt:0}).amt+(sTot.by["MB Way"]||{tip:0}).tip),ST.kM)]);
+    cr.push([]); cr.push([tx("Type the counted cash in B"+cC+" if it was not entered in the app; the difference updates.",ST.sub)]);
+    var cuOpt={cols:[[1,1,48],[2,2,16]], merges:cuT.merges};
+  }
+
   // ---- Summary (inputs + formulas) ----
   var perGuest = S_.guests>0 ? r.total/S_.guests : 0;
-  var st=titleRows("Open Bar \u2014 Summary",2), sum=st.rows.slice();
+  var st=titleRows((CASH?"Cash Bar":"Open Bar")+" \u2014 Summary",2), sum=st.rows.slice();
   sum.push([tx("Event",ST.kL),tx(S_.ev||"")]);
   sum.push([tx("Date",ST.kL),tx(S_.dt||"")]);
   sum.push([tx("Guests",ST.kL),nn(S_.guests||0,ST.kI)]); var rGuests=sum.length;
   sum.push([tx("Hours",ST.kL),nn(S_.hours||0,ST.kI)]); var rHours=sum.length;
   sum.push([]);
+  if(CASH){
+    sum.push([tx("Mode",ST.kL),tx("Cash bar — guests pay per drink")]);
+    sum.push([tx("Bar sales (excl. tips)",ST.kL),fx("'Sales'!C"+slTotRow,r2(sTot.sales),ST.kM)]); var rSales=sum.length;
+    sum.push([tx("Tips",ST.kL),fx("'Sales'!D"+slTotRow,r2(sTot.tips),ST.kM)]);
+    sum.push([tx("Orders",ST.kL),fx("'Sales'!B"+slTotRow,sTot.orders,ST.kI)]); var rOrd=sum.length;
+    sum.push([tx("Average order",ST.kL),fx("IF(B"+rOrd+"=0,0,ROUND(B"+rSales+"/B"+rOrd+",2))",sTot.orders?r2(sTot.sales/sTot.orders):0,ST.kM)]);
+    sum.push([tx("Sales per guest",ST.kL),fx("IF(B"+rGuests+"=0,0,ROUND(B"+rSales+"/B"+rGuests+",2))",S_.guests?r2(sTot.sales/S_.guests):0,ST.kM)]);
+    sum.push([tx("Transportation (invoiced to the client separately)",ST.kL),nn(r2(chg.transport),ST.kM)]);
+    sum.push([tx("Cash difference at cash-up (+ over / − short)",ST.kL),fx("'Cash-up'!B"+(cE+2),cu.diff==null?"":r2(cu.diff),ST.kM)]);
+  } else {
   sum.push([tx("Rate €/guest/hour",ST.kL),nn(r2(chg.rate),ST.kM)]); var rRate=sum.length;
   sum.push([tx("Package charged",ST.kL),nn(r2(chg.pkg),ST.kM)]); var rPkg=sum.length;
   sum.push([tx("Extra service time (hours)",ST.kL),nn(S_.extraHours||0,ST.kI)]); var rExtraH=sum.length;
@@ -1423,15 +1578,18 @@ function buildBytes(){
   sum.push([tx("Billed cocktails charge",ST.kL),fx("B"+rBillN+"*B"+rBillP, r2(bdX.total), ST.kM)]); var rBill=sum.length;
   sum.push([tx("Transportation (separate)",ST.kL),nn(r2(chg.transport),ST.kM)]); var rTrans=sum.length;
   sum.push([tx("Grand total to invoice",ST.kL),fx("B"+rService+"+B"+rBill+"+B"+rTrans, r2(chg.grand), ST.kM)]);
+  }
   sum.push([]);
   sum.push([tx("Drinks poured (cocktails, spirits, wine, beer)",ST.kL),nn(r.countTotal,ST.kI)]); var rDrinks=sum.length;
   sum.push([tx("Drinks per guest",ST.kL),fx("IF(B"+rGuests+"=0,0,B"+rDrinks+"/B"+rGuests+")", r2(perGuest), ST.kM)]);
   sum.push([tx("Drinks per guest / hour",ST.kL),fx("IF(B"+rGuests+"*B"+rHours+"=0,0,ROUND(B"+rDrinks+"/(B"+rGuests+"*B"+rHours+"),2))", (S_.guests&&S_.hours?Math.round(r.countTotal/(S_.guests*S_.hours)*100)/100:0), ST.kM)]);
   sum.push([tx("Soft drinks & water served (not in average)",ST.kL),nn(r.nonCountTotal,ST.kI)]);
-  sum.push([tx("Client-provided served (stats only, not charged)",ST.kL),nn(r.clientTotal,ST.kI)]);
+  if(!CASH) sum.push([tx("Client-provided served (stats only, not charged)",ST.kL),nn(r.clientTotal,ST.kI)]);
+  if(!CASH){
   sum.push([tx("Consumed at reference price",ST.kL),nn(r2(r.consVal),ST.kM)]); var rCons=sum.length;
   sum.push([tx("Consumed per guest",ST.kL),fx("IF(B"+rGuests+"=0,0,B"+rCons+"/B"+rGuests+")", r2(S_.guests?r.consVal/S_.guests:0), ST.kM)]);
   sum.push([tx("Consumed vs charged (%)",ST.kL),fx("IF(B"+rService+"=0,0,ROUND(B"+rCons+"/B"+rService+"*100,0))", (chg.service?Math.round(r.consVal/chg.service*100):0), ST.kI)]);
+  }
   sum.push([]);
   sum.push([tx("Breakage charges",ST.kL),nn(r2(r.breakVal),ST.kM)]); var rBreak=sum.length;
   sum.push([tx("Refundable deposit",ST.kL),nn(S_.deposit||0,ST.kM)]); var rDep=sum.length;
@@ -1440,11 +1598,11 @@ function buildBytes(){
     var stFirst=sum.length+1;
     for(var si2=0;si2<S_.staff.length;si2++) sum.push([tx(S_.staff[si2].role,ST.dL),nn(S_.staff[si2].n,ST.dI)]);
     sum.push([tx("Total staff",ST.totL),fx("SUM(B"+stFirst+":B"+(sum.length)+")", (function(){var t=0;for(var i=0;i<S_.staff.length;i++)t+=S_.staff[i].n;return t;})(), ST.totI)]); }
-  var sumOpt={cols:[[1,1,34],[2,2,16]], merges:st.merges};
+  var sumOpt={cols:[[1,1,46],[2,2,16]], merges:st.merges};
 
   // ---- Consumption (value = units × price; subtotals & total = SUM) ----
   var ct=titleRows("Consumption",5), con=ct.rows.slice();
-  con.push([tx("Category",ST.hL),tx("Item",ST.hL),tx("Units",ST.hR),tx("Ref. price",ST.hR),tx("Value",ST.hR)]);
+  con.push([tx("Category",ST.hL),tx("Item",ST.hL),tx("Units",ST.hR),tx(CASH?"Avg price":"Ref. price",ST.hR),tx(CASH?"Sales":"Value",ST.hR)]);
   var em=menu();
   function block(wantCount){ var su=[], sv=[];
     for(var a=0;a<em.length;a++){ var c=em[a].c; if(!r.cats[c]) continue; if(!!countsToward(c)!==wantCount) continue;
@@ -1454,7 +1612,8 @@ function buildBytes(){
       con.push([tx(c,ST.catL),tx("",ST.catL),fx("SUM(C"+first+":C"+last+")", r.cats[c].q, ST.catI),tx("",ST.catL),fx("SUM(E"+first+":E"+last+")", r2(r.cats[c].v), ST.catM)]);
       su.push("C"+subRow); sv.push("E"+subRow);
       for(var k2=0;k2<kids.length;k2++){ var n=kids[k2], cr=con.length+1;
-        con.push([tx("",ST.dL),tx(n,ST.dL),nn(r.items[n].q,ST.dI),nn(priceOf(n),ST.dM),fx("C"+cr+"*D"+cr, r2(r.items[n].v), ST.dM)]); } }
+        var pr0 = CASH ? r2(r.items[n].v/r.items[n].q) : priceOf(n);
+        con.push([tx("",ST.dL),tx(n,ST.dL),nn(r.items[n].q,ST.dI),nn(pr0,ST.dM),fx("C"+cr+"*D"+cr, r2(CASH?pr0*r.items[n].q:r.items[n].v), ST.dM)]); } }
     return {su:su,sv:sv}; }
   var cb=block(true);
   con.push([tx("TOTAL — cocktails, spirits, wine, beer",ST.totL),tx("",ST.totL),fx(cb.su.length?cb.su.join("+"):"0", r.countTotal, ST.totI),tx("",ST.totL),fx(cb.sv.length?cb.sv.join("+"):"0", r2(r.countVal), ST.totM)]);
@@ -1540,7 +1699,6 @@ function buildBytes(){
   var shT=titleRows("Staff hours",8), shr=shT.rows.slice();
   shr.push([tx("Name",ST.hL),tx("Role",ST.hL),tx("In",ST.hR),tx("Out",ST.hR),tx("Break (min)",ST.hR),tx("Hours",ST.hR),tx("Rate €/h",ST.hR),tx("Cost",ST.hR)]);
   var sF=shr.length+1, sC=0;
-  function dayFrac(t){ var d=new Date(t); return Math.round(((d.getHours()*60+d.getMinutes())/1440)*1e6)/1e6; }
   for(var shi=0;shi<S_.shifts.length;shi++){ var sh=S_.shifts[shi]; if(!sh.in) continue; var rr=shr.length+1, outT=sh.out||Date.now();
     shr.push([tx((sh.name||"")+(sh.out?"":" (still on shift at export)"),ST.dL),tx(sh.role||"",ST.dL),{v:dayFrac(sh.in),n:true,s:ST.dT},{v:dayFrac(outT),n:true,s:ST.dT},nn(sh.brk||0,ST.dI),
       fx("ROUND(MAX(0,MOD(D"+rr+"-C"+rr+",1)*24-E"+rr+"/60),2)", r2(shiftHours(sh)), ST.dD), nn(roleRate(sh.role),ST.dM), fx("F"+rr+"*G"+rr, r2(shiftHours(sh)*roleRate(sh.role)), ST.dM)]); sC++; }
@@ -1564,7 +1722,9 @@ function buildBytes(){
   skr.push([]); skr.push([tx("Diff = registered − what the stock should have given. Negative: stock used but not registered. Positive: registered more than the stock explains.",ST.sub)]);
   var skOpt={cols:[[1,1,30],[2,9,12]], merges:skT.merges, freeze:4};
 
-  var sheets=[["Summary",sum,sumOpt],["Consumption",con,conOpt],["Breakages",brk,brkOpt],["Consumption by hour",tim,timOpt],["Billed cocktails",bil,bilOpt],["Spirit Serves",srv,srvOpt],["Staff hours",shr,shOpt],["Stock",skr,skOpt]];
+  var sheets = CASH
+    ? [["Summary",sum,sumOpt],["Sales",sl,slOpt],["Cash-up",cr,cuOpt],["Consumption",con,conOpt],["Breakages",brk,brkOpt],["Consumption by hour",tim,timOpt],["Spirit Serves",srv,srvOpt],["Staff hours",shr,shOpt],["Stock",skr,skOpt]]
+    : [["Summary",sum,sumOpt],["Consumption",con,conOpt],["Breakages",brk,brkOpt],["Consumption by hour",tim,timOpt],["Billed cocktails",bil,bilOpt],["Spirit Serves",srv,srvOpt],["Staff hours",shr,shOpt],["Stock",skr,skOpt]];
   return xlsxFromSheets(sheets);
 }
 /* package [name, rows, opts] sheets into an .xlsx (zip, no compression, no libraries) */
@@ -1655,7 +1815,7 @@ el("bkFile").onchange=function(e){
       ask("Restore this backup?","This replaces the current event entirely with the backup"+(st.ev?' “'+st.ev+'”':"")+". Save the current one first if you need it.","Replace",function(){ doRestore(st); });
     } else {
       var d=mergePreview(st);
-      ask("Merge this backup?","Adds "+d.drinks+" drinks and "+d.breaks+" breakages from"+(st.ev?' “'+st.ev+'”':" the backup")+" into this event. Counts are summed; this event's setup and prices stay as they are.","Merge",function(){ doMerge(st); });
+      ask("Merge this backup?",((st.sales&&st.sales.length)?"Adds "+st.sales.length+" sale(s), ":"Adds ")+d.drinks+" drinks and "+d.breaks+" breakages from"+(st.ev?' “'+st.ev+'”':" the backup")+" into this event. Counts are summed; this event's setup and prices stay as they are.","Merge",function(){ doMerge(st); });
     }
   };
   rd.readAsText(f);
@@ -1669,7 +1829,7 @@ function mergePreview(o){
 function doRestore(o){
   delete o._catalog;
   S=normalizeState(o);
-  S.open=true; recompute(); migrateV1(); save();
+  S.open=true; recompute(); migrateV1(); save(); applyMode();
   drawCats(); drawGrid(); drawGlasses(); drawUndo(); show("close"); header();
   toast("Backup restored");
 }
@@ -1680,8 +1840,13 @@ function doMerge(o){
   for(var h1=0;h1<oc0.length;h1++) for(var h2=0;h2<oc0[h1].items.length;h2++) hint[oc0[h1].items[h2].n]=oc0[h1].items[h2].p;
   for(var h3=0;h3<incoming.length;h3++){ var it0=incoming[h3].item; if(incoming[h3].kind!=="drink"||DEFP.hasOwnProperty(it0)) continue;
     if(!S.customItems.some(function(c){return c[0]===it0;})) S.customItems.push([it0, hint[it0]!=null?hint[it0]:((o.prices&&o.prices[it0])||0)]); }
-  for(var i=0;i<incoming.length;i++){ var e=incoming[i];
-    S.log.push({id:S.seq++, t:(e.t||null), kind:e.kind, item:e.item, mixer:e.mixer||null, billed:!!e.billed}); }
+  // sales from the other till (cash bar): new ids, and its drinks keep pointing at their sale
+  var smap={}, osales=o.sales||[];
+  for(var sx=0;sx<osales.length;sx++){ var cp=deep(osales[sx]), nid=S.seq++; smap[cp.id]=nid; cp.id=nid; S.sales.push(cp); }
+  if(osales.length) S.sales.sort(function(a,b){ return a.t-b.t; });
+  for(var i=0;i<incoming.length;i++){ var e=incoming[i], ne={id:S.seq++, t:(e.t||null), kind:e.kind, item:e.item, mixer:e.mixer||null, billed:!!e.billed};
+    if(e.sale!=null && smap[e.sale]!=null) ne.sale=smap[e.sale];
+    S.log.push(ne); }
   // union custom items by name (keep a price if we don't have one)
   var have={}; for(var a=0;a<S.customItems.length;a++) have[S.customItems[a][0].toLowerCase()]=S.customItems[a];
   var oc=o.customItems||[];
@@ -1855,7 +2020,8 @@ function summaryNow(){ var r=report(), ch=charges(), tm=timing(), bd=billed(), s
   return { guests:S.guests||0, hours:S.hours||0, drinks:r.countTotal, soft:r.nonCountTotal, client:r.clientTotal,
     perGuest:S.guests?r.countTotal/S.guests:0, perGuestHour:(S.guests&&S.hours)?r.countTotal/(S.guests*S.hours):0,
     consVal:r.consVal, service:ch.service, grand:ch.grand, ratio:ch.service?r.consVal/ch.service:0,
-    peakHr:tm.peakHr, peakN:tm.peakN, breakVal:r.breakVal, billed:bd.count, staffHours:st.hours, staffCost:st.cost }; }
+    peakHr:tm.peakHr, peakN:tm.peakN, breakVal:r.breakVal, billed:bd.count, staffHours:st.hours, staffCost:st.cost,
+    mode:S.mode||"open", sales:salesTotals().sales, tips:salesTotals().tips, orders:salesTotals().orders }; }
 /* run fn() as if a past event were the live one (report(), buildBytes()… all read the globals) */
 function withEvent(entry, fn){ var keepS=S, keepC=CAT, out;
   S=normalizeState(deep(entry.state)); CAT=entry.cat?deep(entry.cat):keepC; applyCatalog(); recompute();
@@ -1868,19 +2034,19 @@ function archiveCurrent(){ if(!S.log.length && !S.open) return null;
 function drawArchive(){ var a=loadArc();
   if(!a.length){ el("arcList").innerHTML='<p class="hint">No past events yet. When you tap “Clear and start a new event”, the finished event is stored here.</p>';
     el("arcCompare").innerHTML='<p class="hint">Needs at least one past event.</p>'; return; }
-  var c='<div class="wrapx"><table><tr><th>Date</th><th>Event</th><th class="n">Guests</th><th class="n">Drinks</th><th class="n">/guest</th><th class="n">/guest/h</th><th class="n">Peak</th><th class="n">Used vs charged</th><th class="n">Invoice</th></tr>';
+  var c='<div class="wrapx"><table><tr><th>Date</th><th>Event</th><th class="n">Guests</th><th class="n">Drinks</th><th class="n">/guest</th><th class="n">/guest/h</th><th class="n">Peak</th><th class="n">Used vs charged</th><th class="n">Invoice / sales</th></tr>';
   var tg=0,td=0,n=0;
   for(var i=0;i<a.length;i++){ var s=a[i].sum||{};
     c+='<tr><td>'+esc(a[i].dt||new Date(a[i].closedAt).toLocaleDateString())+'</td><td>'+esc(a[i].ev)+'</td><td class="n">'+(s.guests||"")+'</td><td class="n">'+(s.drinks||0)+'</td>'+
        '<td class="n">'+(s.guests?dec(s.perGuest,1):"")+'</td><td class="n">'+(s.perGuestHour?dec(s.perGuestHour,2):"")+'</td><td class="n">'+(s.peakHr!=null?pad2(s.peakHr)+":00":"")+'</td>'+
-       '<td class="n">'+(s.service?Math.round(s.ratio*100)+"%":"")+'</td><td class="n">'+eur(s.grand||0)+'</td></tr>';
+       '<td class="n">'+(s.service?Math.round(s.ratio*100)+"%":(s.mode==="cash"?"cash bar":""))+'</td><td class="n">'+eur(s.mode==="cash"?(s.sales||0):(s.grand||0))+'</td></tr>';
     if(s.guests){ tg+=s.guests; td+=s.drinks||0; n++; } }
   if(n) c+='<tr class="tot"><td colspan="4">Average across '+n+' events</td><td class="n">'+dec(td/tg,1)+'</td><td colspan="4"></td></tr>';
   el("arcCompare").innerHTML=c+'</table></div>';
   var h="";
   for(var j=0;j<a.length;j++){ var e=a[j], s2=e.sum||{};
     h+='<div class="arcItem"><div class="at">'+esc(e.ev)+'</div>'+
-       '<div class="as">'+esc(e.dt||"")+' · '+(s2.guests||0)+' guests · '+(s2.drinks||0)+' drinks · invoice '+eur(s2.grand||0)+' · closed '+new Date(e.closedAt).toLocaleString()+'</div>'+
+       '<div class="as">'+(s2.mode==="cash"?"Cash bar · ":"Open bar · ")+esc(e.dt||"")+' · '+(s2.guests||0)+' guests · '+(s2.drinks||0)+' drinks · '+(s2.mode==="cash"?"sales "+eur(s2.sales||0):"invoice "+eur(s2.grand||0))+' · closed '+new Date(e.closedAt).toLocaleString()+'</div>'+
        '<div class="ar"><button class="chip" data-arx="'+e.id+'">Excel</button><button class="chip" data-arb="'+e.id+'">Backup file</button>'+
        '<button class="chip" data-aro="'+e.id+'">Reopen</button><button class="chip" data-ard="'+e.id+'" style="color:#e7a08f">Delete</button></div></div>'; }
   el("arcList").innerHTML=h; }
@@ -1896,7 +2062,7 @@ el("arcList").onclick=function(ev){ var b=ev.target.closest("button"); if(!b) re
       if(S.open||S.log.length) archiveCurrent();
       var a=loadArc().filter(function(x){return x.id!==e3.id;}); saveArc(a);
       var keepSel=S.itemSel, keepG=S.glassSel;
-      S=normalizeState(deep(e3.state)); S.open=true; if(!S.itemSel||!Object.keys(S.itemSel).length) S.itemSel=keepSel; if(!S.glassSel||!Object.keys(S.glassSel).length) S.glassSel=keepG;
+      S=normalizeState(deep(e3.state)); S.open=true; applyMode(); if(!S.itemSel||!Object.keys(S.itemSel).length) S.itemSel=keepSel; if(!S.glassSel||!Object.keys(S.glassSel).length) S.glassSel=keepG;
       recompute(); save(); header(); show("close"); toast("Reopened"); }); return; }
   if(b.dataset.ard){ var id=+b.dataset.ard;
     ask("Delete this past event?","It is removed from this device. Make sure you exported it if you need it.","Delete",function(){ saveArc(loadArc().filter(function(x){return x.id!==id;})); drawArchive(); }); } };
@@ -1918,7 +2084,7 @@ el("arcCompareX").onclick=function(){ var a=loadArc(); if(!a.length){ toast("No 
 function buildCompareBytes(a){
   function tx(v,s){return {v:v==null?"":v,s:s||ST.dL};} function nn(v,s){return {v:(isFinite(v)?Math.round(v*100)/100:0),n:true,s:s||ST.dI};}
   var rows=[[{v:"Open Bar — event comparison",s:ST.title}],[{v:"South Side — bar catering & consulting · exported "+new Date().toLocaleString(),s:ST.sub}],[]];
-  rows.push([tx("Date",ST.hL),tx("Event",ST.hL),tx("Guests",ST.hR),tx("Hours",ST.hR),tx("Drinks",ST.hR),tx("Drinks / guest",ST.hR),tx("Drinks / guest / hour",ST.hR),tx("Peak hour",ST.hR),tx("Consumed at ref. €",ST.hR),tx("Service charged €",ST.hR),tx("Consumed vs charged %",ST.hR),tx("Invoice total €",ST.hR),tx("Breakages €",ST.hR),tx("Staff hours",ST.hR),tx("Staff cost €",ST.hR)]);
+  rows.push([tx("Date",ST.hL),tx("Event",ST.hL),tx("Guests",ST.hR),tx("Hours",ST.hR),tx("Drinks",ST.hR),tx("Drinks / guest",ST.hR),tx("Drinks / guest / hour",ST.hR),tx("Peak hour",ST.hR),tx("Consumed at ref. €",ST.hR),tx("Service charged €",ST.hR),tx("Consumed vs charged %",ST.hR),tx("Invoice total €",ST.hR),tx("Breakages €",ST.hR),tx("Staff hours",ST.hR),tx("Staff cost €",ST.hR),tx("Mode",ST.hL),tx("Bar sales €",ST.hR),tx("Tips €",ST.hR)]);
   var first=rows.length+1;
   for(var i=0;i<a.length;i++){ var s=a[i].sum||{}, r=rows.length+1;
     rows.push([tx(a[i].dt||new Date(a[i].closedAt).toLocaleDateString()),tx(a[i].ev),nn(s.guests),nn(s.hours,ST.dD),nn(s.drinks),
@@ -1926,15 +2092,15 @@ function buildCompareBytes(a){
       {f:"IF(C"+r+"*D"+r+"=0,0,ROUND(E"+r+"/(C"+r+"*D"+r+"),2))",v:Math.round((s.perGuestHour||0)*100)/100,s:ST.dD},
       tx(s.peakHr!=null?pad2(s.peakHr)+":00":""),nn(s.consVal,ST.dM),nn(s.service,ST.dM),
       {f:"IF(J"+r+"=0,0,ROUND(I"+r+"/J"+r+"*100,0))",v:s.service?Math.round(s.ratio*100):0,s:ST.dI},
-      nn(s.grand,ST.dM),nn(s.breakVal,ST.dM),nn(s.staffHours,ST.dD),nn(s.staffCost,ST.dM)]); }
+      nn(s.grand,ST.dM),nn(s.breakVal,ST.dM),nn(s.staffHours,ST.dD),nn(s.staffCost,ST.dM),tx(s.mode==="cash"?"Cash bar":"Open bar"),nn(s.sales||0,ST.dM),nn(s.tips||0,ST.dM)]); }
   var last=rows.length;
   function av(f){ var t=0,n=0; for(var q=0;q<a.length;q++){ var v=f(a[q].sum||{}); if(isFinite(v)){ t+=v; n++; } } return n?Math.round(t/n*100)/100:0; }
   var AV={C:av(function(s){return s.guests||0;}),D:av(function(s){return s.hours||0;}),E:av(function(s){return s.drinks||0;}),F:av(function(s){return s.perGuest||0;}),G:av(function(s){return s.perGuestHour||0;}),
     I:av(function(s){return s.consVal||0;}),J:av(function(s){return s.service||0;}),K:av(function(s){return s.service?Math.round(s.ratio*100):0;}),L:av(function(s){return s.grand||0;}),M:av(function(s){return s.breakVal||0;}),N:av(function(s){return s.staffHours||0;}),O:av(function(s){return s.staffCost||0;})};
   rows.push([tx("Average",ST.totL),tx("",ST.totL),{f:"ROUND(AVERAGE(C"+first+":C"+last+"),0)",v:Math.round(AV.C),s:ST.totI},{f:"ROUND(AVERAGE(D"+first+":D"+last+"),2)",v:AV.D,s:ST.totD},{f:"ROUND(AVERAGE(E"+first+":E"+last+"),0)",v:AV.E,s:ST.totI},
     {f:"ROUND(AVERAGE(F"+first+":F"+last+"),2)",v:AV.F,s:ST.totD},{f:"ROUND(AVERAGE(G"+first+":G"+last+"),2)",v:AV.G,s:ST.totD},tx("",ST.totL),{f:"AVERAGE(I"+first+":I"+last+")",v:AV.I,s:ST.totM},{f:"AVERAGE(J"+first+":J"+last+")",v:AV.J,s:ST.totM},
-    {f:"ROUND(AVERAGE(K"+first+":K"+last+"),0)",v:AV.K,s:ST.totI},{f:"AVERAGE(L"+first+":L"+last+")",v:AV.L,s:ST.totM},{f:"AVERAGE(M"+first+":M"+last+")",v:AV.M,s:ST.totM},{f:"ROUND(AVERAGE(N"+first+":N"+last+"),2)",v:AV.N,s:ST.totD},{f:"AVERAGE(O"+first+":O"+last+")",v:AV.O,s:ST.totM}]);
-  return xlsxFromSheets([["Events",rows,{cols:[[1,1,12],[2,2,30],[3,15,13]],merges:["A1:O1","A2:O2"],freeze:4}]]); }
+    {f:"ROUND(AVERAGE(K"+first+":K"+last+"),0)",v:AV.K,s:ST.totI},{f:"AVERAGE(L"+first+":L"+last+")",v:AV.L,s:ST.totM},{f:"AVERAGE(M"+first+":M"+last+")",v:AV.M,s:ST.totM},{f:"ROUND(AVERAGE(N"+first+":N"+last+"),2)",v:AV.N,s:ST.totD},{f:"AVERAGE(O"+first+":O"+last+")",v:AV.O,s:ST.totM},tx("",ST.totL),{f:"AVERAGE(Q"+first+":Q"+last+")",v:av(function(s){return s.sales||0;}),s:ST.totM},{f:"AVERAGE(R"+first+":R"+last+")",v:av(function(s){return s.tips||0;}),s:ST.totM}]);
+  return xlsxFromSheets([["Events",rows,{cols:[[1,1,12],[2,2,30],[3,15,13],[16,16,11],[17,18,13]],merges:["A1:R1","A2:R2"],freeze:4}]]); }
 
 /* ============ SETTINGS (catalogue editor) ============ */
 var setTab="drinks";
@@ -2126,10 +2292,165 @@ function handleBack(){ var o=anyOverlayOpen();
 try{ history.replaceState({ob:0},""); history.pushState({ob:1},"");
   window.addEventListener("popstate", function(){ handleBack(); try{ history.pushState({ob:1},""); }catch(e){} }); }catch(e){}
 
+/* ============ CASH BAR (point of sale) ============
+   S.mode = "open" (client pays a package) | "cash" (guests pay per drink).
+   In cash mode a tap adds the drink to S.ticket (the current order). "Charge" opens the payment
+   screen; confirming creates a sale in S.sales and writes one log entry per drink with
+   {sale:<sale id>}, so every count, timing and report keeps working from S.log as usual.
+   Voiding a sale keeps the sale record (void:true) and removes its drinks from S.log.
+   S.sales = [{id, t, lines:[{item,mixer,q,p}], total, method, tip, recv, change, void, voidReason, voidT}] */
+var PAYMENTS=["Cash","Card","MB Way"];      // payment buttons, in order
+var setupMode="open";
+function isCash(){ return (S.open ? S.mode : setupMode)==="cash"; }
+function applyMode(){ document.body.classList.toggle("cash", isCash());
+  var b=document.querySelectorAll("#modeSeg .seg"); for(var i=0;i<b.length;i++) b[i].classList.toggle("on", b[i].dataset.mode===(S.open?S.mode:setupMode)); }
+el("modeSeg").onclick=function(e){ var b=e.target.closest("[data-mode]"); if(!b) return;
+  if(S.open){ toast("The mode is fixed once the bar is open"); return; }
+  setupMode=b.dataset.mode; var pr=loadPrefs(); pr.lastMode=setupMode; savePrefs(pr); applyMode(); };
+
+/* every drink tap goes through here */
+function tapDrink(n,mixer){ if(S.open && S.mode==="cash") addTicket(n,mixer); else pour(n,mixer); }
+
+function ticketCount(){ var c=0; for(var i=0;i<S.ticket.length;i++) c+=S.ticket[i].q; return c; }
+function ticketTotal(){ var t=0; for(var i=0;i<S.ticket.length;i++) t+=S.ticket[i].q*S.ticket[i].p; return Math.round(t*100)/100; }
+function addTicket(n,mixer){ var l=null;
+  for(var i=0;i<S.ticket.length;i++) if(S.ticket[i].item===n && (S.ticket[i].mixer||null)===(mixer||null)){ l=S.ticket[i]; break; }
+  if(l) l.q++; else S.ticket.push({item:n, mixer:mixer||null, q:1, p:priceOf(n)});
+  save(); drawTicket(); drawUndo(); }
+function drawTicket(){ if(!el("tkLines")) return;
+  var h=""; if(!S.ticket.length) h='<p class="hint" style="margin:10px 0">Tap drinks to build the order.</p>';
+  for(var i=0;i<S.ticket.length;i++){ var l=S.ticket[i];
+    h+='<div class="tkL"><span class="tkn">'+esc(l.item)+(l.mixer?'<small>'+esc(l.mixer)+'</small>':'')+'</span>'+
+       '<button class="step" data-tkm="'+i+'">−</button><span class="tkq">'+l.q+'</span><button class="step" data-tkp="'+i+'">+</button>'+
+       '<span class="tkp">'+eur(l.q*l.p)+'</span></div>'; }
+  el("tkLines").innerHTML=h; var c=ticketCount();
+  el("tkCount").textContent=c+(c===1?" item":" items"); el("tkTotal").textContent=eur(ticketTotal());
+  el("tkCharge").disabled=!c; el("tkCharge").textContent = c ? "Charge "+eur(ticketTotal()) : "Charge"; }
+fastTap(el("tkLines"), ".step", function(b){
+  if(b.dataset.tkp!=null){ S.ticket[+b.dataset.tkp].q++; }
+  else if(b.dataset.tkm!=null){ var i=+b.dataset.tkm; S.ticket[i].q--; if(S.ticket[i].q<=0) S.ticket.splice(i,1); }
+  save(); drawTicket(); drawUndo(); });
+el("tkClear").onclick=function(){ if(!S.ticket.length) return; ask("Clear this order?","The drinks in the current order are removed. Nothing has been charged.","Clear",function(){ S.ticket=[]; save(); drawTicket(); drawUndo(); }); };
+function ticketUndo(){ if(!S.ticket.length){ toast("Order is empty. To cancel a paid sale use Sales › Void"); return; }
+  var l=S.ticket[S.ticket.length-1]; l.q--; if(l.q<=0) S.ticket.pop(); save(); drawTicket(); drawUndo(); toast("Removed "+l.item); }
+
+/* ---- payment ---- */
+var payMethod=null;
+function payDue(){ return ticketTotal(); }
+function payTip(){ return Math.max(0, num(el("payTip").value)); }
+el("tkCharge").onclick=function(){ if(!ticketCount()) return; payMethod=null;
+  el("payTotal").textContent=eur(payDue()); el("paySub").textContent=ticketCount()+" drink(s). Choose how the guest paid.";
+  el("payTip").value=""; el("payRecv").value=""; drawPay(); el("payOv").classList.add("on"); };
+function drawPay(){ var h=""; for(var i=0;i<PAYMENTS.length;i++) h+='<button data-pm="'+esc(PAYMENTS[i])+'"'+(payMethod===PAYMENTS[i]?' class="on"':'')+'>'+esc(PAYMENTS[i])+'</button>';
+  el("payMethods").innerHTML=h;
+  var cash=payMethod==="Cash", co=document.querySelectorAll("#payOv .payCashOnly");
+  for(var k=0;k<co.length;k++) co[k].style.display=cash?"":"none";
+  if(cash){ var due=payDue()+payTip(), q=[], steps=[5,10,20,50,100];
+    for(var s=0;s<steps.length;s++){ var v=Math.ceil(due/steps[s])*steps[s]; if(v>due && q.indexOf(v)<0 && q.length<4) q.push(v); }
+    var qh='<button class="qbtn" data-qr="'+due+'">Exact</button>'; for(var j=0;j<q.length;j++) qh+='<button class="qbtn" data-qr="'+q[j]+'">'+eur(q[j]).replace(",00","")+'</button>';
+    el("payQuick").innerHTML=qh; drawChange(); }
+  payOkLabel(); }
+function payOkLabel(){ el("payOk").textContent = payMethod ? "Confirm "+payMethod+" "+eur(payDue()+payTip()) : "Choose a payment method"; }
+function drawChange(){ var due=payDue()+payTip(), rv=el("payRecv").value.trim(), r=rv===""?due:num(rv), ch=r-due;
+  el("payChange").innerHTML = ch < -0.004 ? '<b style="color:var(--warn)">'+eur(-ch)+' still missing</b>' : 'Change to give: <b style="color:var(--gold);font-size:20px">'+eur(ch)+'</b>'; }
+el("payMethods").onclick=function(e){ var b=e.target.closest("[data-pm]"); if(!b) return; payMethod=b.dataset.pm; drawPay(); };
+el("payQuick").onclick=function(e){ var b=e.target.closest("[data-qr]"); if(!b) return; el("payRecv").value=dec(+b.dataset.qr,2); drawChange(); };
+el("payRecv").oninput=drawChange;
+el("payTip").oninput=function(){ if(payMethod==="Cash") drawPay(); else payOkLabel(); };
+el("payCancel").onclick=function(){ el("payOv").classList.remove("on"); };
+el("payOk").onclick=function(){ if(!payMethod){ toast("Choose Cash, Card or MB Way"); return; }
+  var due=payDue(), tip=Math.round(payTip()*100)/100, recv=null, change=0;
+  if(payMethod==="Cash"){ var rv=el("payRecv").value.trim(); recv= rv===""? due+tip : num(rv); change=Math.round((recv-due-tip)*100)/100;
+    if(change<-0.004){ toast("Cash received is less than the total"); return; } }
+  var id=S.seq++, t=Date.now();
+  for(var i=0;i<S.ticket.length;i++){ var l=S.ticket[i]; for(var k=0;k<l.q;k++) S.log.push({id:S.seq++, t:t, kind:"drink", item:l.item, mixer:l.mixer||null, billed:false, sale:id}); }
+  S.sales.push({id:id, t:t, lines:deep(S.ticket), total:due, method:payMethod, tip:tip, recv:recv, change:change, void:false});
+  S.ticket=[]; recompute(); save();
+  el("payOv").classList.remove("on"); drawTicket(); refreshBadges(); drawCats(); drawUndo(); header();
+  toast("Paid "+eur(due+tip)+" · "+payMethod+(payMethod==="Cash"&&change>0.004?" · change "+eur(change):"")); };
+
+/* ---- sales list, void, change method ---- */
+function findSale(id){ for(var i=0;i<S.sales.length;i++) if(S.sales[i].id===id) return S.sales[i]; return null; }
+function saleItemsText(sl){ return sl.lines.map(function(l){ return (l.q>1?l.q+"× ":"")+l.item+(l.mixer?" ("+l.mixer+")":""); }).join(", "); }
+function saleQty(sl){ var q=0; for(var i=0;i<sl.lines.length;i++) q+=sl.lines[i].q; return q; }
+function salesTotals(st){ st=st||S; var r={orders:0,sales:0,tips:0,drinks:0,voidN:0,voidAmt:0,by:{}};
+  for(var p=0;p<PAYMENTS.length;p++) r.by[PAYMENTS[p]]={n:0,amt:0,tip:0};
+  for(var i=0;i<(st.sales||[]).length;i++){ var s=st.sales[i];
+    if(s.void){ r.voidN++; r.voidAmt+=s.total; continue; }
+    if(!r.by[s.method]) r.by[s.method]={n:0,amt:0,tip:0};
+    r.orders++; r.sales+=s.total; r.tips+=s.tip||0; r.drinks+=saleQty(s);
+    r.by[s.method].n++; r.by[s.method].amt+=s.total; r.by[s.method].tip+=s.tip||0; }
+  r.sales=Math.round(r.sales*100)/100; r.tips=Math.round(r.tips*100)/100;
+  return r; }
+function methodTable(t){ var h='<table><tr><th>Method</th><th class="n">Orders</th><th class="n">Sales</th><th class="n">Tips</th><th class="n">Total taken</th></tr>';
+  var ks=Object.keys(t.by);
+  for(var i=0;i<ks.length;i++){ var b=t.by[ks[i]]; h+='<tr><td>'+esc(ks[i])+'</td><td class="n">'+b.n+'</td><td class="n">'+eur(b.amt)+'</td><td class="n">'+eur(b.tip)+'</td><td class="n">'+eur(b.amt+b.tip)+'</td></tr>'; }
+  h+='<tr class="tot"><td>Total</td><td class="n">'+t.orders+'</td><td class="n">'+eur(t.sales)+'</td><td class="n">'+eur(t.tips)+'</td><td class="n">'+eur(t.sales+t.tips)+'</td></tr></table>';
+  if(t.voidN) h+='<p class="hint" style="margin-top:8px">'+t.voidN+' voided sale(s) worth '+eur(t.voidAmt)+' — not included above.</p>';
+  return h; }
+function drawSales(){ var t=salesTotals();
+  el("salesTot").innerHTML=methodTable(t);
+  if(!S.sales.length){ el("salesList").innerHTML='<p class="hint">No sales yet.</p>'; return; }
+  var h="";
+  for(var i=S.sales.length-1;i>=0;i--){ var s=S.sales[i];
+    h+='<div class="saleRow'+(s.void?" void":"")+'" data-sale="'+s.id+'"><span class="st">'+fmtTime(s.t)+'</span><span class="si2">'+esc(saleItemsText(s))+(s.void?' <b style="color:var(--warn)">VOID</b>':'')+'</span>'+
+       '<span class="sm">'+esc(s.method)+'</span><span class="sa">'+eur(s.total)+(s.tip?'<br><small style="color:var(--dim);font-weight:600">+'+eur(s.tip)+' tip</small>':'')+'</span></div>'; }
+  el("salesList").innerHTML=h; }
+var openSaleId=null;
+el("salesList").onclick=function(e){ var r=e.target.closest("[data-sale]"); if(!r) return; openSale(+r.dataset.sale); };
+function openSale(id){ var s=findSale(id); if(!s) return; openSaleId=id;
+  el("sdTitle").textContent="Sale · "+fmtTime(s.t)+" · "+eur(s.total)+(s.void?" · VOID":"");
+  el("sdSub").textContent = s.void ? ("Voided "+fmtTime(s.voidT)+(s.voidReason?" — "+s.voidReason:"")) : (s.method+(s.tip?" · tip "+eur(s.tip):"")+(s.method==="Cash"&&s.recv!=null?" · received "+eur(s.recv)+" · change "+eur(s.change):""));
+  var lh='<table>'; for(var i=0;i<s.lines.length;i++){ var l=s.lines[i]; lh+='<tr><td>'+l.q+'× '+esc(l.item)+(l.mixer?' <span style="color:var(--dim)">· '+esc(l.mixer)+'</span>':'')+'</td><td class="n">'+eur(l.q*l.p)+'</td></tr>'; }
+  el("sdLines").innerHTML=lh+'</table>';
+  var mh=""; for(var p=0;p<PAYMENTS.length;p++) mh+='<button data-sdm="'+esc(PAYMENTS[p])+'"'+(s.method===PAYMENTS[p]?' class="on"':'')+(s.void?' disabled':'')+'>'+esc(PAYMENTS[p])+'</button>';
+  el("sdMethods").innerHTML=mh;
+  el("sdReasonWrap").style.display = s.void ? "none" : ""; el("sdReason").value="";
+  el("sdVoid").textContent = s.void ? "Restore sale" : "Void sale";
+  el("sdVoid").className = s.void ? "big" : "danger";
+  el("saleOv").classList.add("on"); }
+el("sdMethods").onclick=function(e){ var b=e.target.closest("[data-sdm]"); if(!b) return; var s=findSale(openSaleId); if(!s||s.void) return;
+  s.method=b.dataset.sdm; save(); openSale(s.id); drawSales(); toast("Changed to "+s.method); };
+el("sdClose").onclick=function(){ el("saleOv").classList.remove("on"); openSaleId=null; };
+el("sdVoid").onclick=function(){ var s=findSale(openSaleId); if(!s) return;
+  if(!s.void){ s.void=true; s.voidReason=el("sdReason").value.trim(); s.voidT=Date.now();
+    S.log=S.log.filter(function(x){ return x.sale!==s.id; }); toast("Sale voided — "+eur(s.total)+" taken out"); }
+  else { s.void=false; s.voidReason=""; s.voidT=null;
+    for(var i=0;i<s.lines.length;i++) for(var k=0;k<s.lines[i].q;k++) S.log.push({id:S.seq++, t:s.t, kind:"drink", item:s.lines[i].item, mixer:s.lines[i].mixer||null, billed:false, sale:s.id});
+    S.log.sort(function(a,b){ return (a.t||0)-(b.t||0); }); toast("Sale restored"); }
+  recompute(); save(); el("saleOv").classList.remove("on"); openSaleId=null; drawSales(); refreshBadges(); drawCats(); drawUndo(); header(); };
+
+/* ---- close-out: sales + cash-up ---- */
+function cashUp(st){ st=st||S; var t=salesTotals(st), c=t.by.Cash||{amt:0,tip:0};
+  var exp=Math.round(((st.float||0)+c.amt+c.tip)*100)/100, cnt=st.cashCount;
+  return {t:t, float:st.float||0, cashSales:c.amt, cashTips:c.tip, expected:exp, counted:cnt, diff:(cnt==null?null:Math.round((cnt-exp)*100)/100)}; }
+function drawCashReports(){ var t=salesTotals(), g=S.guests||0;
+  var h='<div class="kpi">'+
+    '<div class="kbox"><div class="kl">Bar sales</div><div class="kv">'+eur(t.sales)+'</div><div class="kx">excl. '+eur(t.tips)+' tips</div></div>'+
+    '<div class="kbox"><div class="kl">Orders</div><div class="kv">'+t.orders+'</div><div class="kx">avg '+eur(t.orders?t.sales/t.orders:0)+' per order</div></div>'+
+    '<div class="kbox"><div class="kl">Sales / guest</div><div class="kv">'+(g?eur(t.sales/g):"—")+'</div><div class="kx">'+t.drinks+' drinks sold</div></div></div><div style="height:10px"></div>'+methodTable(t);
+  if(S.transport) h+='<p class="hint" style="margin-top:8px">Transportation '+eur(S.transport)+' is invoiced to the client separately.</p>';
+  h+='<p class="hint" style="margin-top:8px">This till records sales for control. Legal invoices / receipts are issued with the company’s certified invoicing software.</p>';
+  el("repSales").innerHTML=h;
+  drawCashupBox();
+  if(el("cCount") && document.activeElement!==el("cCount")) el("cCount").value = S.cashCount==null ? "" : dec(S.cashCount,2); }
+function drawCashupBox(){ var c=cashUp(), card=c.t.by.Card||{amt:0,tip:0}, mb=c.t.by["MB Way"]||{amt:0,tip:0};
+  var h='<table><tr><td>Opening float</td><td class="n">'+eur(c.float)+'</td></tr>'+
+    '<tr><td>+ Cash sales</td><td class="n">'+eur(c.cashSales)+'</td></tr>'+
+    '<tr><td>+ Cash tips</td><td class="n">'+eur(c.cashTips)+'</td></tr>'+
+    '<tr class="tot"><td>Cash expected in drawer</td><td class="n">'+eur(c.expected)+'</td></tr>'+
+    '<tr><td>Cash counted</td><td class="n">'+(c.counted==null?"—":eur(c.counted))+'</td></tr>'+
+    '<tr class="tot"><td>'+(c.diff==null?"Difference":(c.diff>=0.005?"Over":(c.diff<=-0.005?"Short":"Difference")))+'</td><td class="n" style="color:'+(c.diff==null||Math.abs(c.diff)<0.005?"inherit":(c.diff<0?"var(--warn)":"var(--gold)"))+'">'+(c.diff==null?"—":eur(c.diff))+'</td></tr></table>'+
+    '<div style="height:12px"></div><table><tr><th>Check against terminal</th><th class="n">Sales + tips</th></tr>'+
+    '<tr><td>Card (TPA)</td><td class="n">'+eur(card.amt+card.tip)+'</td></tr><tr><td>MB Way</td><td class="n">'+eur(mb.amt+mb.tip)+'</td></tr></table>'+
+    '<p class="hint" style="margin-top:8px">Cash to bank = counted cash − opening float'+(c.counted==null?"":" = <b>"+eur(c.counted-c.float)+"</b>")+'.</p>';
+  el("repCashup").innerHTML=h; }
+el("cCount").oninput=function(){ S.cashCount=numOrNull(this.value); save(); drawCashupBox(); };
+
 /* ============ NAV / SETUP ============ */
 /* screens: ALWAYS = usable before the bar is open; the rest need an open event */
 var ALWAYS={setup:1,prices:1,glasscfg:1,menucfg:1,settings:1,archive:1};
-var PANELS=["setup","glasses","glasscfg","menucfg","adjust","history","prices","close","staff","stock","settings","archive"];
+var PANELS=["setup","glasses","glasscfg","menucfg","adjust","history","prices","close","staff","stock","settings","archive","sales"];
 function show(v){
   if(!S.open && !ALWAYS[v]) v="setup";
   if(v!==view){ navPush(); _ghost.t=0; }
@@ -2139,7 +2460,9 @@ function show(v){
   el("serve").style.display = (v==="serve"&&S.open)?"flex":"none";
   for(k=0;k<PANELS.length;k++){ var pe=el("p-"+PANELS[k]); if(pe) pe.classList.toggle("on", PANELS[k]===v); }
   var on=document.querySelector("#nav .navbtn.on"); if(on && on.scrollIntoView) try{ on.scrollIntoView({block:"nearest",inline:"nearest"}); }catch(e){}
-  if(v==="serve") { drawBill(); drawCats(); drawGrid(); }
+  applyMode();
+  if(v==="serve") { drawBill(); drawCats(); drawGrid(); drawTicket(); drawUndo(); }
+  if(v==="sales") drawSales();
   if(v==="staff") drawStaff();
   if(v==="stock") drawStock();
   if(v==="settings") drawSettings();
@@ -2159,7 +2482,7 @@ for(var z=0;z<nbs.length;z++){ if(!nbs[z].dataset.v) continue;
 function header(){
   el("hEv").textContent = S.open ? (S.ev||"Open Bar") : "Open Bar";
   el("hSub").textContent = S.open
-    ? (S.dt?S.dt+" \u00b7 ":"")+(S.guests?S.guests+" guests \u00b7 ":"")+totalDrinks()+" drinks"+(memOnly?" \u00b7 NOT SAVING — keep this tab open":"")
+    ? (S.mode==="cash"?"Cash bar \u00b7 "+eur(salesTotals().sales)+" \u00b7 ":"")+(S.dt?S.dt+" \u00b7 ":"")+(S.guests?S.guests+" guests \u00b7 ":"")+totalDrinks()+" drinks"+(memOnly?" \u00b7 NOT SAVING — keep this tab open":"")
     : "Not started";
 }
 setInterval(header,1000);
@@ -2187,25 +2510,28 @@ el("staffRows").onclick=function(e){ var d=e.target.closest("[data-sdel]"); if(!
 function staffClean(){ var out=[]; for(var i=0;i<setupStaff.length;i++){ var r=(setupStaff[i].role||"").trim(); var n=setupStaff[i].n||0; if(r&&n>0) out.push({role:r,n:n}); } return out; }
 
 el("sGo").onclick=function(){
-  var g=num(el("sGu").value);
-  S={open:true, ev:(el("sEv").value.trim()||"Open Bar"), dt:el("sDt").value.trim(),
-     guests:Math.round(g), hours:num(el("sHr").value), rate:num(el("sRt").value),
-     pkg:num(el("sPk").value), deposit:num(el("sDp").value), transport:num(el("sTr").value), extraHours:0,
+  var g=num(el("sGu").value), cash=setupMode==="cash";
+  S={open:true, ev:(el("sEv").value.trim()||(cash?"Cash Bar":"Open Bar")), dt:el("sDt").value.trim(),
+     guests:Math.round(g), hours:num(el(cash?"sHr2":"sHr").value), rate:cash?0:num(el("sRt").value),
+     pkg:cash?0:num(el("sPk").value), deposit:num(el("sDp").value), transport:num(el("sTr").value), extraHours:0,
+     mode:setupMode, float:cash?num(el("sFl").value):0, sales:[], ticket:[], cashCount:null,
      staff:staffClean(), log:[], seq:1, billing:false, billedPrice:(S.billedPrice||0),
      counts:{}, breaks:{}, serves:{}, prices:S.prices||{},
      customItems:[], glassSel:S.glassSel||{}, glassPrices:{}, itemSel:S.itemSel||{}, clientItems:{},
      shifts:[], stock:{}, openedAt:Date.now() };
-  save(); wakeOn(); drawCats(); drawGrid(); drawGlasses(); drawUndo(); show("serve"); header();
-  toast("Bar open"+(g?" \u00b7 "+Math.round(g)+" guests":""));
+  save(); wakeOn(); applyMode(); drawCats(); drawGrid(); drawGlasses(); drawTicket(); drawUndo(); show("serve"); header();
+  toast((cash?"Cash bar open":"Bar open")+(g?" \u00b7 "+Math.round(g)+" guests":""));
 };
 el("resetBtn").onclick=function(){
   ask("Clear everything?","Every count and the setup will be deleted. Save a backup or export first.","Clear it all",function(){
     var archived=archiveCurrent();
     var keepPrices=S.prices||{}, keepSel=S.glassSel||{}, keepItem=S.itemSel||{}, keepBill=S.billedPrice||0;
-    S={open:false,ev:"",dt:"",guests:0,hours:0,pkg:0,rate:0,deposit:0,transport:0,extraHours:0,staff:[],log:[],seq:1,billing:false,billedPrice:keepBill,counts:{},breaks:{},serves:{},prices:keepPrices,customItems:[],glassSel:keepSel,glassPrices:{},itemSel:keepItem,clientItems:{},shifts:[],stock:{},openedAt:null};
+    S={open:false,ev:"",dt:"",guests:0,hours:0,pkg:0,rate:0,deposit:0,transport:0,extraHours:0,staff:[],log:[],seq:1,billing:false,billedPrice:keepBill,counts:{},breaks:{},serves:{},prices:keepPrices,customItems:[],glassSel:keepSel,glassPrices:{},itemSel:keepItem,clientItems:{},shifts:[],stock:{},openedAt:null,
+       mode:"open",float:0,sales:[],ticket:[],cashCount:null};
+    applyMode();
     wakeOff();
     try{ localStorage.removeItem(KEY); }catch(e){}
-    ["sEv","sDt","sGu","sHr","sRt","sPk","sDp","sTr"].forEach(function(id){el(id).value="";});
+    ["sEv","sDt","sGu","sHr","sRt","sPk","sDp","sTr","sHr2","sFl"].forEach(function(id){el(id).value="";});
     setupStaff=[]; drawStaffRows(); save(); show("setup"); header();
     toast(archived===false ? "Cleared — couldn't copy to Past events (storage full)" : "Cleared — event kept in Past events");
   });
@@ -2217,6 +2543,8 @@ if(el("setupLogo")) el("setupLogo").src=LOGO_WHITE;
 loadCat();
 load();
 migrateV1();
+setupMode = (loadPrefs().lastMode==="cash") ? "cash" : "open";
+applyMode(); drawTicket();
 drawStaffRows();
 if(el("sVer")) el("sVer").textContent="Open Bar Tracker v"+APP_VERSION;
 view="";

@@ -3,7 +3,7 @@
    index.html, and set the same number in APP_VERSION inside index.html.
    Strategy: the app page is fetched from the network first (so updates arrive as soon as the
    device is online) and falls back to the saved copy when offline. Icons etc. are cache-first. */
-const CACHE = "ssb-openbar-2.0.0";
+const CACHE = "ssb-openbar-2.1.0";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
